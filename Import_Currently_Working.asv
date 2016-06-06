@@ -9,7 +9,7 @@ startnum = 1
 tincrmnt = startnum;
 incrmnt = startnum;
 ttext = '';
-for incrmnt = startnum:365
+for incrmnt = startnum:180
     if incrmnt ~= 40
         if numel(num2str(tincrmnt)) == 1;
             tnumhold = num2str(tincrmnt);
@@ -32,7 +32,7 @@ for incrmnt = startnum:365
             structdata = rmfield(structdata,'rowheaders'); %controversial and unused
             numdata = structdata.data;
             structtext = structdata.textdata;
-            disp(['file ' num2str(incrmnt) '.dat succesful'])
+            disp(['file ' num2str(incrmnt) ' succesful'])
         end
         if exist(ttext) == 0
             warning(['FILE ' ttext ' DOES NOT EXIST'])
