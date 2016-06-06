@@ -1,42 +1,50 @@
 %{
-raw:
-"2014-01-01 00:00:00",3617737,42.33333,28,753.3,18.875,808.1333,0,73226.56,1
-"yyyy-mm-dd hh:mm:ss",xxxxxxx,####,####,###,#
+A  = '350 2014    1   1   0   0.0    40.39'
+header1 = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+fid=fopen('MyFile.txt','w');
+fprintf(fid, [ header1 '\n']);
+fprintf(fid, [ A '\n']);
+fclose(fid);
 %}
 clc
+tic
+startnum = 1;
+endnum = 1;
+disp(['Start: ' num2str(startnum)]) 
+disp(['End: ' num2str(endnum)])
+head = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'
 
-startnum = 1
-tincrmnt = startnum;
-incrmnt = startnum;
-ttext = '';
-for incrmnt = startnum:180
-    if incrmnt ~= 40
-        if numel(num2str(tincrmnt)) == 1;
-            tnumhold = num2str(tincrmnt);
+for startnum = startnum:endnum
+    if startnum ~= 40
+        if numel(num2str(startnum)) == 1;
+            tnumhold = num2str(startnum);
             tincrmntstr = ['00' tnumhold];
         end
-        if numel(num2str(tincrmnt)) == 2;
-            tnumhold = num2str(tincrmnt);
+        if numel(num2str(startnum)) == 2;
+            tnumhold = num2str(startnum);
             tincrmntstr = ['0' tnumhold];
         end
-        if numel(num2str(tincrmnt)) == 3;
-            %    tnumhold = num2str(tincrmnt);
-            %    tincrmntstr = ['' tnumhold];
-            tincrmntstr = num2str(tincrmnt);
+        if numel(num2str(startnum)) == 3;
+            tincrmntstr = num2str(startnum);
         end
-        
         ttext = ['BAO_OZ3_2014' tincrmntstr '.dat'];
-        
-        if exist(ttext) == 2
+        if exist(ttext,'file') == 2
+            FileIsReal=1;
             structdata = importdata(ttext);
-            structdata = rmfield(structdata,'rowheaders'); %controversial and unused
+            structdata = rmfield(structdata,'rowheaders');
             numdata = structdata.data;
-            structtext = structdata.textdata;
-            disp(['file ' num2str(incrmnt) ' succesful'])
-        end
-        if exist(ttext) == 0
+            textdata = structdata.textdata;
+            disp(['file ' num2str(startnum) '.dat succesful'])
+            
+            
+            
+        else
             warning(['FILE ' ttext ' DOES NOT EXIST'])
+            FileIsReal=0;
         end
+        
     end
-    tincrmnt = tincrmnt+1;
 end
+
+clear ans endnum incrmnt startnum tincrmnt tincrmntstr tnumhold ttext
+toc
