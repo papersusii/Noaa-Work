@@ -10,45 +10,99 @@ STN YEAR  MON  DAY  HR  MIN  O3(PPB)
 %}
 clc
 tic
-startnum = 1;
-endnum = 1;
-disp(['Start: ' num2str(startnum)]) 
-disp(['End: ' num2str(endnum)])
-header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'
+startNum = 1;
+endNum = 1;
+disp(['Start: ' num2str(startNum)])
+disp(['End: ' num2str(endNum)])
+header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+%incr2 = 1;
 
-for startnum = startnum:endnum
-    if startnum ~= 40
-        if numel(num2str(startnum)) == 1;
-            tnumhold = num2str(startnum);
-            tincrmntstr = ['00' tnumhold];
+for startNum = startNum:endNum
+    if startNum ~= 40
+        if numel(num2str(startNum)) == 1;
+            textNumberHold = num2str(startNum);
+            textIncrString = ['00' textNumberHold];
         end
-        if numel(num2str(startnum)) == 2;
-            tnumhold = num2str(startnum);
-            tincrmntstr = ['0' tnumhold];
+        if numel(num2str(startNum)) == 2;
+            textNumberHold = num2str(startNum);
+            textIncrString = ['0' textNumberHold];
         end
-        if numel(num2str(startnum)) == 3;
-            tincrmntstr = num2str(startnum);
-        end
-        ttext = ['BAO_OZ3_2014' tincrmntstr '.dat'];
-        if exist(ttext,'file') == 2
-            FileIsReal=1;
-            structdata = importdata(ttext);
-            structdata = rmfield(structdata,'rowheaders');
-            numdata = structdata.data;
-            textdata = structdata.textdata;
-            disp(['file ' num2str(startnum) '.dat succesful'])
-            
-            %
-            
-            
-            %
-        else
-            warning(['FILE ' ttext ' DOES NOT EXIST'])
-            FileIsReal=0;
+        if numel(num2str(startNum)) == 3;
+            textIncrString = num2str(startNum);
         end
         
+        titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
+        if exist(titleText,'file') == 2
+            fileIsReal=1;
+            structData = rmfield(importdata(titleText),'rowheaders');
+            numData = structData.data;
+            textData = structData.textdata;
+            disp(['file ' num2str(startNum) '.dat succesful'])
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            numDataClean=numData(1:length(numData),2)+.0001;
+            textData=textData(1:length(textData));
+            
+            avgSet=1;
+            count=1;
+            incr3=2;
+            
+            oneMinFullSet=cell((length(textData)/2)+1,1);
+            
+            if avgSet==1
+                for count=1:(length(textData))
+                    if count == 1
+                        oneMinNumLine=num2str(numDataClean(1));
+                        %oneMinNumLine=num2str(oneMinNumLine);
+                        oneMinNumLine=oneMinNumLine(1:5);
+                        oneminDateLine= char(textData(1));
+                        textLine = (['350 ' oneminDateLine(1:4) '   ' oneminDateLine(6:7) '  ' oneminDateLine(9:10) '  ' oneminDateLine(12:13) '  ' oneminDateLine(15:16) '.0    ' oneMinNumLine]);
+                        oneMinFullSet(1,1)=cellstr(textLine);
+                    else
+                        oneMinNumLine=mean(numDataClean(incr3:incr3+1));
+                        oneMinNumLine=num2str(oneMinNumLine);
+                        oneMinNumLine=oneMinNumLine(1:5);
+                        oneminDateLine = char(textData(incr3+1));
+                        textLine = (['350 ' oneminDateLine(1:4) '   ' oneminDateLine(6:7) '  ' oneminDateLine(9:10) '  ' oneminDateLine(12:13) '  ' oneminDateLine(15:16) '.0    ' oneMinNumLine]);
+                        incr3=incr3+2;
+                        oneMinFullSet(count,1)=cellstr(textLine);
+                        if (length(textData) <= (incr3)) ==1
+                            break
+                        end
+                    end
+                end
+            end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %{
+            A  = '350 2014    1   1   0   0.0    40.39'
+            header1 = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+            fid=fopen('MyFile.txt','w');
+            fprintf(fid, [ header1 '\n']);
+            fprintf(fid, [ A '\n']);
+            fclose(fid);
+            STN YEAR  MON  DAY  HR  MIN  O3(PPB)
+            350 2014    1   1   0   0.0    40.39
+            %}
+        else
+            warning(['FILE ' titleText ' DOES NOT EXIST'])
+            fileIsReal=0;
+        end
     end
 end
 
 clear ans endnum incrmnt startnum tincrmnt tincrmntstr tnumhold ttext
+clear FileIsReal header incr2 structdata
 toc
+
+%{
+if avgset==1
+    for count = 1:1 %length(textdata);
+        a=num2str(numdataClean(count));
+        a=a(1:5);
+        OneMinDateLine = char(textdata(count));
+        textline = (['350 ' OneMinDateLine(1:4) '   ' OneMinDateLine(6:7) '  ' OneMinDateLine(9:10) '  ' OneMinDateLine(12:13) '  ' OneMinDateLine(15:16) '.0    ' a]);
+    end
+end
+
+%}
