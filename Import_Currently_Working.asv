@@ -10,8 +10,8 @@ STN YEAR  MON  DAY  HR  MIN  O3(PPB)
 %}
 clc
 tic
-startNum = 1;
-endNum = 1;
+startNum = 400;
+endNum = 400;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
 header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
@@ -31,12 +31,12 @@ for startNum = startNum:endNum
             textIncrString = num2str(startNum);
         end
         
-         = ['BAO_OZ3_2014' textIncrString '.dat'];
-        if exist(ttext,'file') == 2
-            FileIsReal=1;
-            structdata = rmfield(importdata(ttext),'rowheaders');
-            numData = structdata.data;
-            textData = structdata.textdata;
+        titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
+        if exist(titleText,'file') == 2
+            fileIsReal=1;
+            structData = rmfield(importdata(titleText),'rowheaders');
+            numData = structData.data;
+            textData = structData.textdata;
             disp(['file ' num2str(startNum) '.dat succesful'])
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,30 +44,30 @@ for startNum = startNum:endNum
             numDataClean=numData(1:length(numData),2)+.0001;
             textData=textData(1:length(textData));
             
-            avgset=1;
+            avgSet=1;
             count=1;
             incr3=2;
             
-            OneMinFullCell=cell(length(textData)/2+1,1);
+            oneMinFullSet=cell((length(textData)/2)+1,1);
             
-            if avgset==1
+            if avgSet==1
                 for count=1:(length(textData))
                     if count == 1
-                        OneMinNumLine=numDataClean(1);
-                        OneMinNumLine=num2str(OneMinNumLine);
-                        OneMinNumLine=OneMinNumLine(1:5);
-                        OneMinDateLine= char(textData(1));
-                        textline = (['350 ' OneMinDateLine(1:4) '   ' OneMinDateLine(6:7) '  ' OneMinDateLine(9:10) '  ' OneMinDateLine(12:13) '  ' OneMinDateLine(15:16) '.0    ' OneMinNumLine]);
-                        OneMinFullCell(1,1)=cellstr(textline);
+                        oneMinNumLine=num2str(numDataClean(1));
+                        %oneMinNumLine=num2str(oneMinNumLine);
+                        oneMinNumLine=oneMinNumLine(1:5);
+                        oneminDateLine= char(textData(1));
+                        textLine = (['350 ' oneminDateLine(1:4) '   ' oneminDateLine(6:7) '  ' oneminDateLine(9:10) '  ' oneminDateLine(12:13) '  ' oneminDateLine(15:16) '.0    ' oneMinNumLine]);
+                        oneMinFullSet(1,1)=cellstr(textLine);
                     else
-                        OneMinNumLine=mean(numDataClean(incr3:incr3+1));
-                        OneMinNumLine=num2str(OneMinNumLine);
-                        OneMinNumLine=OneMinNumLine(1:5);
-                        OneMinDateLine = char(textData(incr3+1));
-                        textline = (['350 ' OneMinDateLine(1:4) '   ' OneMinDateLine(6:7) '  ' OneMinDateLine(9:10) '  ' OneMinDateLine(12:13) '  ' OneMinDateLine(15:16) '.0    ' OneMinNumLine]);
+                        oneMinNumLine=mean(numDataClean(incr3:incr3+1));
+                        oneMinNumLine=num2str(oneMinNumLine);
+                        oneMinNumLine=oneMinNumLine(1:5);
+                        oneminDateLine = char(textData(incr3+1));
+                        textLine = (['350 ' oneminDateLine(1:4) '   ' oneminDateLine(6:7) '  ' oneminDateLine(9:10) '  ' oneminDateLine(12:13) '  ' oneminDateLine(15:16) '.0    ' oneMinNumLine]);
                         incr3=incr3+2;
-                        OneMinFullCell(count,1)=cellstr(textline);
-                        if (length(textData) <= (incr3)) ==1
+                        oneMinFullSet(count,1)=cellstr(textLine);
+                        if (length(textData) <= (incr3)) ==1 %For the record, I have no idea how th
                             break
                         end
                     end
@@ -85,8 +85,8 @@ for startNum = startNum:endNum
             350 2014    1   1   0   0.0    40.39
             %}
         else
-            warning(['FILE ' ttext ' DOES NOT EXIST'])
-            FileIsReal=0;
+            warning(['FILE ' titleText ' DOES NOT EXIST'])
+            fileIsReal=0;
         end
     end
 end

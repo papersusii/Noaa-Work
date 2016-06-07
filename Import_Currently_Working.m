@@ -10,8 +10,8 @@ STN YEAR  MON  DAY  HR  MIN  O3(PPB)
 %}
 clc
 tic
-startNum = 1;
-endNum = 1;
+startNum = 400;
+endNum = 400;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
 header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
@@ -67,7 +67,9 @@ for startNum = startNum:endNum
                         textLine = (['350 ' oneminDateLine(1:4) '   ' oneminDateLine(6:7) '  ' oneminDateLine(9:10) '  ' oneminDateLine(12:13) '  ' oneminDateLine(15:16) '.0    ' oneMinNumLine]);
                         incr3=incr3+2;
                         oneMinFullSet(count,1)=cellstr(textLine);
-                        if (length(textData) <= (incr3)) ==1
+                        if (length(textData) <= (incr3)) ==1 %For the record, I have no idea how this works or
+                            %why it works so well, but it does so just keep
+                            %it here and don't touch it. thx
                             break
                         end
                     end
