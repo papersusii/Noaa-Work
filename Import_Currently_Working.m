@@ -8,13 +8,43 @@ fclose(fid);
 STN YEAR  MON  DAY  HR  MIN  O3(PPB)
 350 2014    1   1   0   0.0    40.39
 %}
+%{
+Things you MIGHT need to do before using:
+
+You MUST change directories to the one that has your text file in it.
+%{
+run
+
+>> cd C:\Users\xxx\Documents\MATLAB
+
+where everything after "cd " is the path to your FOLDER with all the files
+inside of it. This is absolutely necissary
+%}
+
+Turn off a specific warning (like 'variable names were modified...')
+%{
+to turn ofh the header that says "variable names were modified to make them valid matlab identifiers"
+just run the command that issues a warning, then directly after run
+
+>> [a, MSGID] = lastwarn();
+>> warning('off', MSGID)
+
+You can then delete MSGID and a. Be warned, I don't know how
+to turn the warning back on (although it's proably pretty simple) so
+if you need those in the future, I wouldn't do this.
+
+This also works for any other warnings
+%}
+%}
+
+clear all
 clc
 tic
-startNum = 13;
-endNum = 13;
+startNum = 1;
+endNum = 400;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
-header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+% header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'; %DO NOT DELETE PLEASE
 %incr2 = 1;
 
 %tableData=readtable(titleText);
@@ -39,17 +69,16 @@ for startNum = startNum:endNum
         
         titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
         if exist(titleText,'file') == 2
-            fileIsReal=1;
-%             structData = rmfield(importdata(titleText),'rowheaders'); %unnecisary
+            % fileIsReal=1; %DO NOT DELETE PLEASE
+            % structData = rmfield(importdata(titleText),'rowheaders'); %unnecisary           
 
             tableData=readtable(titleText);
             tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
-            
-            
-            
-            disp(['file ' num2str(startNum) '.dat succesful'])
+            [a, MSGID] = lastwarn();
+            %disp(['FILE ' num2str(startNum) '.dat IMPORTED'])
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
             %{
 numData = tableData.ozone;
 textData = tableData.date;
@@ -60,7 +89,7 @@ for x = 1:height(numData)
 %     findNan = strfind(char(numData.numData(x)),'NAN')
 %     findNeg = strfind(char(numData.numData(x)),'-')
 %     if findNan ~= 1
-%         
+%
     findNan=char(numData.numData(x,1));
     
     if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
@@ -71,10 +100,51 @@ for x = 1:height(numData)
     end
 end
             
-            %}  
+            %
             numDataClean=numData(1:length(numData),2)+.0001;
             textData=textData(1:length(textData));
             
+            %}
+            
+            numData = tableData.ozone;
+            textData = tableData.date;
+            x=1;
+            if iscell(numData)== 1;
+                
+                numData=cell2table(numData);
+                numDataClean = zeros(height(numData),1);
+                
+                for x = 1:height(numData)
+                    findNan=char(numData.numData(x,1));
+                    
+                    if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
+                        numDataClean(x,1)=str2num(char(numData.numData(x,1)));
+                    else
+                        numDataClean(x,1)=NaN;
+                        %warning(['FILE ' textIncrString ' at ' num2str(x)]);
+                        %warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
+                    end
+                end
+            else
+                numDataClean=numData;
+                for x = 1:length(numData)
+                    if ((isnan(numData(x,1)) ~= 1) && (sign(numData(x,1)) ~= -1)) == 1
+                        
+                    else
+                        numDataClean(x,1)=NaN;
+                        
+                        %warning(['FILE ' textIncrString ' at ' num2str(x)]);
+                        % warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
+                    end
+                end
+            end
+            numDataClean=numDataClean+.0001;
+            
+            disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
+            
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%
+            %{
             avgSet=1;
             count=1;
             incr3=2;
@@ -105,6 +175,7 @@ end
                     end
                 end
             end
+            %}
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %{
             A  = '350 2014    1   1   0   0.0    40.39'
@@ -120,11 +191,14 @@ end
             warning(['FILE ' titleText ' DOES NOT EXIST'])
             fileIsReal=0;
         end
+    else
+       % disp(['FILE ' num2str(startNum) '.dat DOES NOT EXIST']);
     end
-    clear structData 
 end
-clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
-clear startNum y.qyBgmx.pDrne 
+clear structData
+
+% clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
+% clear startNum y.qyBgmx.pDrne
 toc
 
 %{
@@ -136,5 +210,4 @@ if avgset==1
         textline = (['350 ' OneMinDateLine(1:4) '   ' OneMinDateLine(6:7) '  ' OneMinDateLine(9:10) '  ' OneMinDateLine(12:13) '  ' OneMinDateLine(15:16) '.0    ' a]);
     end
 end
-
 %}
