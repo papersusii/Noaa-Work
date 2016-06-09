@@ -42,7 +42,9 @@ clear all
 clc
 tic
 startNum = 1;
-endNum = 52;
+startNumForCalc=startNum;
+endNum = 1;
+avgSet=1;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
 % header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'; %DO NOT DELETE PLEASE
@@ -62,18 +64,10 @@ for startNum = startNum:endNum
         if numel(num2str(startNum)) == 3;
             textIncrString = num2str(startNum);
         end
-        
         titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
         if exist(titleText,'file') == 2
-            % fileIsReal=1; %DO NOT DELETE PLEASE
-            % structData = rmfield(importdata(titleText),'rowheaders'); %unnecisary           
-
             tableData=readtable(titleText);
             tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
-            [a, MSGID] = lastwarn();
-            %disp(['FILE ' num2str(startNum) '.dat IMPORTED'])
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             %{
 numData = tableData.ozone;
@@ -134,11 +128,41 @@ end
                     end
                 end
             end
-            numDataClean=numDataClean+.0001;
-            
+            numDataClean=numDataClean+.0001; %might me unnecisary but idk so im leaving it
+            numDataClean(numDataClean>200)=NaN
+			
             disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
             
-            
+            %BELOW IS THE BEST CODE I HAVE EVER WRITTEN PLZ DON'T LOSE THIS
+            %
+            if avgSet == 1
+                
+                numDATSOne=numDataClean(1:2:end);
+                numDATSTwo=numDataClean(2:2:end,1);
+                x=1;
+                for x=1:length(numDATSOne)
+                    numDataHold(1)=numDATSOne(x);
+                    numDataHold(2)=numDATSTwo(x);
+                    %{
+                    if nh1 ~= nan || nh2 ~= nan %exclusive or
+                           navg=nh1+nh2
+                    end
+                  if nh1 ~= nan && nh2 ~=nan
+                             navg= sun(nh1(isnan(num blah blah blah /2
+                     end
+                     if nh1 == nan && nh2 ==  nan
+                             navg = nan
+                 end
+                %}
+                 %   numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
+                end
+                numDAvgOneMin=numDAvgOneMin';
+                
+                %either throw it out
+                %avg with zero
+                %leave it be
+
+            end
             %%%%%%%%%%%%%%%%%%%%%%%%%%
             %{
             avgSet=1;
@@ -193,12 +217,15 @@ end
 end
 clear structData
 
+
 % clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
 % clear startNum y.qyBgmx.pDrne
 
 time=toc;
 disp([ num2str(time) ' seconds total']);
-disp([ (num2str(endNum/time)) ' seconds average per file.']);
+%disp([ (num2str((abs((endNum-startNumForCalc)))/time) ' seconds average per file.']);
+%disp([ num2str((abs(endNum-startNumForCalc))/time) ' seconds average' ]);
+disp([ num2str((abs((time/(endNum-startNumForCalc))))) ' seconds/file']);
 
 %{
 if avgset==1
@@ -210,3 +237,16 @@ if avgset==1
     end
 end
 %}
+
+%% Just in case you need this later here is the origional avergeger for 1
+%%min
+numDATSOne=numDataClean(1:2:end,1);
+numDATSTwo=numDataClean(2:2:end,1);
+x=1;
+for x=1:length(numDATSOne)
+    numDataHold(1)=numDATSOne(x);
+    numDataHold(2)=numDATSTwo(x);
+    numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
+end
+numDAvgOneMin=numDAvgOneMin';
+%%
