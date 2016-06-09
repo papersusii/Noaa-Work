@@ -26,8 +26,9 @@ Turn off a specific warning (like 'variable names were modified...')
 to turn ofh the header that says "variable names were modified to make them valid matlab identifiers"
 just run the command that issues a warning, then directly after run
 
->> [a, MSGID] = lastwarn();
->> warning('off', MSGID)
+tableData=readtable('BAO_OZ3_2014001.dat'); %Don't use this if you have a different error
+[a, MSGID] = lastwarn();
+warning('off', MSGID)
 
 You can then delete MSGID and a. Be warned, I don't know how
 to turn the warning back on (although it's proably pretty simple) so
@@ -41,18 +42,13 @@ clear all
 clc
 tic
 startNum = 1;
-endNum = 400;
+endNum = 52;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
 % header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'; %DO NOT DELETE PLEASE
 %incr2 = 1;
 
 %tableData=readtable(titleText);
-
-
-
-
-
 for startNum = startNum:endNum
     if startNum ~= 40
         if numel(num2str(startNum)) == 1;
@@ -199,7 +195,10 @@ clear structData
 
 % clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
 % clear startNum y.qyBgmx.pDrne
-toc
+
+time=toc;
+disp([ num2str(time) ' seconds total']);
+disp([ (num2str(endNum/time)) ' seconds average per file.']);
 
 %{
 if avgset==1
