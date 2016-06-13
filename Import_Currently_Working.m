@@ -42,8 +42,10 @@ clear all
 clc
 tic
 startNum = 1;
+endNum = 3;
+
+
 startNumForCalc=startNum;
-endNum = 1;
 avgSet=1;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
@@ -52,24 +54,24 @@ disp(['End: ' num2str(endNum)])
 
 %tableData=readtable(titleText);
 for startNum = startNum:endNum
-    if startNum ~= 40
-        if numel(num2str(startNum)) == 1;
-            textNumberHold = num2str(startNum);
-            textIncrString = ['00' textNumberHold];
-        end
-        if numel(num2str(startNum)) == 2;
-            textNumberHold = num2str(startNum);
-            textIncrString = ['0' textNumberHold];
-        end
-        if numel(num2str(startNum)) == 3;
-            textIncrString = num2str(startNum);
-        end
-        titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
-        if exist(titleText,'file') == 2
-            tableData=readtable(titleText);
-            tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
-            
-            %{
+	if startNum ~= 40
+		if numel(num2str(startNum)) == 1;
+			textNumberHold = num2str(startNum);
+			textIncrString = ['00' textNumberHold];
+		end
+		if numel(num2str(startNum)) == 2;
+			textNumberHold = num2str(startNum);
+			textIncrString = ['0' textNumberHold];
+		end
+		if numel(num2str(startNum)) == 3;
+			textIncrString = num2str(startNum);
+		end
+		titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
+		if exist(titleText,'file') == 2
+			tableData=readtable(titleText);
+			tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
+			
+			%{
 numData = tableData.ozone;
 textData = tableData.date;
 
@@ -94,47 +96,75 @@ end
             numDataClean=numData(1:length(numData),2)+.0001;
             textData=textData(1:length(textData));
             
-            %}
-            
-            numData = tableData.ozone;
-            textData = tableData.date;
-            x=1;
-            if iscell(numData)== 1;
-                
-                numData=cell2table(numData);
-                numDataClean = zeros(height(numData),1);
-                
-                for x = 1:height(numData)
-                    findNan=char(numData.numData(x,1));
-                    
-                    if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
-                        numDataClean(x,1)=str2num(char(numData.numData(x,1)));
-                    else
-                        numDataClean(x,1)=NaN;
-                        %warning(['FILE ' textIncrString ' at ' num2str(x)]);
-                        %warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
-                    end
-                end
-            else
-                numDataClean=numData;
-                for x = 1:length(numData)
-                    if ((isnan(numData(x,1)) ~= 1) && (sign(numData(x,1)) ~= -1)) == 1
-                        
-                    else
-                        numDataClean(x,1)=NaN;
-                        
-                        %warning(['FILE ' textIncrString ' at ' num2str(x)]);
-                        % warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
-                    end
-                end
-            end
-            numDataClean=numDataClean+.0001; %might me unnecisary but idk so im leaving it
-            numDataClean(numDataClean>200)=NaN
+			%}
 			
-            disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
-            
-            %BELOW IS THE BEST CODE I HAVE EVER WRITTEN PLZ DON'T LOSE THIS
-            %
+			numData = tableData.ozone;
+			textData = tableData.date;
+			x=1;
+			if iscell(numData)== 1;
+				
+				numData=cell2table(numData);
+				numDataClean = zeros(height(numData),1);
+				
+				for x = 1:height(numData)
+					findNan=char(numData.numData(x,1));
+					
+					if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
+						numDataClean(x,1)=str2num(char(numData.numData(x,1)));
+					else
+						numDataClean(x,1)=NaN;
+						%warning(['FILE ' textIncrString ' at ' num2str(x)]);
+						%warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
+					end
+				end
+			else
+				numDataClean=numData;
+				for x = 1:length(numData)
+					if ((isnan(numData(x,1)) ~= 1) && (sign(numData(x,1)) ~= -1)) == 1
+						
+					else
+						numDataClean(x,1)=NaN;
+						
+						%warning(['FILE ' textIncrString ' at ' num2str(x)]);
+						% warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
+					end
+				end
+			end
+			numDataClean=numDataClean+.0001; %might me unnecisary but idk so im leaving it
+			numDataClean(numDataClean>200)=NaN;
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			
+			disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
+			clear numDataOdd numData Even numDataHold x
+			numDataOdd=numDataClean(1:2:end,1);
+			numDataEven=numDataClean(2:2:end,1);
+			x=1;
+			%try
+			if length(numDataOdd) > length(numDataEven) == 1
+				numDataEven(length(numDataOdd),1)=NaN;
+			else
+				numDataOdd(length(numDataEven),1)=NaN;
+			end
+			
+			numDAvgOneMin=zeros([length(numDataOdd),1]);
+			for x=1:length(numDataOdd)
+				%	if (((x == 1) == 1) || ((x==2) ==1)) ~= 1 %why do I have this?
+				numDataHold(1)=numDataOdd(x);
+				numDataHold(2)=numDataEven(x);
+				if ((isnan(numDataHold(1)) == 1) && (isnan(numDataHold(2)) == 1)) == 1
+					numDAvgOneMin(x)=NaN;
+				elseif xor(isnan(numDataHold(1)),isnan(numDataHold(2))) == 1
+					if isnan(numDataHold(1)) == 0
+						numDAvgOneMin(x)=numDataHold(1);
+					else
+						numDAvgOneMin(x)=numDataHold(2);
+					end
+				else
+					numDAvgOneMin(x)=(sum(numDataHold(~isnan(numDataHold)))/2);
+				end
+			end
+			%{
             if avgSet == 1
                 
                 numDATSOne=numDataClean(1:2:end);
@@ -143,7 +173,7 @@ end
                 for x=1:length(numDATSOne)
                     numDataHold(1)=numDATSOne(x);
                     numDataHold(2)=numDATSTwo(x);
-                    %{
+			%{
                     if nh1 ~= nan || nh2 ~= nan %exclusive or
                            navg=nh1+nh2
                     end
@@ -153,18 +183,20 @@ end
                      if nh1 == nan && nh2 ==  nan
                              navg = nan
                  end
-                %}
+			%}
                  %   numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
                 end
                 numDAvgOneMin=numDAvgOneMin';
                 
+				%
                 %either throw it out
                 %avg with zero
                 %leave it be
 
-            end
-            %%%%%%%%%%%%%%%%%%%%%%%%%%
-            %{
+			end
+			%}
+			%%%%%%%%%%%%%%%%%%%%%%%%%%
+			%{
             avgSet=1;
             count=1;
             incr3=2;
@@ -195,9 +227,9 @@ end
                     end
                 end
             end
-            %}
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %{
+			%}
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			%{
             A  = '350 2014    1   1   0   0.0    40.39'
             header1 = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
             fid=fopen('MyFile.txt','w');
@@ -206,20 +238,16 @@ end
             fclose(fid);
             STN YEAR  MON  DAY  HR  MIN  O3(PPB)
             350 2014    1   1   0   0.0    40.39
-            %}
-        else
-            warning(['FILE ' titleText ' DOES NOT EXIST'])
-            fileIsReal=0;
-        end
-    else
-       % disp(['FILE ' num2str(startNum) '.dat DOES NOT EXIST']);
-    end
+			%}
+		else
+			warning(['FILE ' titleText ' DOES NOT EXIST'])
+			fileIsReal=0;
+		end
+	else
+		% disp(['FILE ' num2str(startNum) '.dat DOES NOT EXIST']);
+	end
 end
-clear structData
 
-
-% clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
-% clear startNum y.qyBgmx.pDrne
 
 time=toc;
 disp([ num2str(time) ' seconds total']);
@@ -238,15 +266,22 @@ if avgset==1
 end
 %}
 
+clear structData
+
+
+clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
+clear startNum y.qyBgmx.pDrne
+clear time startNumForCalc numData textNumberHold x findNan
+
 %% Just in case you need this later here is the origional avergeger for 1
 %%min
 numDATSOne=numDataClean(1:2:end,1);
 numDATSTwo=numDataClean(2:2:end,1);
 x=1;
 for x=1:length(numDATSOne)
-    numDataHold(1)=numDATSOne(x);
-    numDataHold(2)=numDATSTwo(x);
-    numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
+	numDataHold(1)=numDATSOne(x);
+	numDataHold(2)=numDATSTwo(x);
+	numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
 end
 numDAvgOneMin=numDAvgOneMin';
 %%
