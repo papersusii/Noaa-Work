@@ -1,13 +1,4 @@
-%{
-A  = '350 2014    1   1   0   0.0    40.39'
-header1 = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
-fid=fopen('MyFile.txt','w');
-fprintf(fid, [ header1 '\n']);
-fprintf(fid, [ A '\n']);
-fclose(fid);
-STN YEAR  MON  DAY  HR  MIN  O3(PPB)
-350 2014    1   1   0   0.0    40.39
-%}
+
 %{
 Things you MIGHT need to do before using:
 
@@ -42,11 +33,11 @@ clear all
 clc
 tic
 startNum = 1;
-endNum = 3;
+endNum = 401;
 
 
 startNumForCalc=startNum;
-avgSet=1;
+%avgSet=1;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
 % header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)'; %DO NOT DELETE PLEASE
@@ -71,36 +62,9 @@ for startNum = startNum:endNum
 			tableData=readtable(titleText);
 			tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
 			
-			%{
-numData = tableData.ozone;
-textData = tableData.date;
-
-x=1
-numData=cell2table(numData);
-for x = 1:height(numData)
-%     findNan = strfind(char(numData.numData(x)),'NAN')
-%     findNeg = strfind(char(numData.numData(x)),'-')
-%     if findNan ~= 1
-%
-    findNan=char(numData.numData(x,1));
-    
-    if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
-        numDataClean(x,1)=str2num(char(numData.numData(x,1)));
-    else
-        numDataClean(x)=NaN;
-        warning(['invalid @ ' num2str(x) ' (+1 for .dat)']);
-    end
-end
-            
-            %
-            numDataClean=numData(1:length(numData),2)+.0001;
-            textData=textData(1:length(textData));
-            
-			%}
-			
 			numData = tableData.ozone;
 			textData = tableData.date;
-			x=1;
+			%x=1;
 			if iscell(numData)== 1;
 				
 				numData=cell2table(numData);
@@ -110,7 +74,8 @@ end
 					findNan=char(numData.numData(x,1));
 					
 					if ((findNan(1) ~= 'N' ) && (findNan(1) ~= '-')) == 1
-						numDataClean(x,1)=str2num(char(numData.numData(x,1)));
+						%numDataClean(x,1)=str2num(char(numData.numData(x,1)));
+						numDataClean(x,1)=str2double(char(numData.numData(x,1)));
 					else
 						numDataClean(x,1)=NaN;
 						%warning(['FILE ' textIncrString ' at ' num2str(x)]);
@@ -132,14 +97,15 @@ end
 			end
 			numDataClean=numDataClean+.0001; %might me unnecisary but idk so im leaving it
 			numDataClean(numDataClean>200)=NaN;
+			numDataClean(numDataClean<1)=NaN;
 			
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 			
-			disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
+			%disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
 			clear numDataOdd numData Even numDataHold x
 			numDataOdd=numDataClean(1:2:end,1);
 			numDataEven=numDataClean(2:2:end,1);
-			x=1;
+			%x=1;
 			%try
 			if length(numDataOdd) > length(numDataEven) == 1
 				numDataEven(length(numDataOdd),1)=NaN;
@@ -164,84 +130,52 @@ end
 					numDAvgOneMin(x)=(sum(numDataHold(~isnan(numDataHold)))/2);
 				end
 			end
-			%{
-            if avgSet == 1
-                
-                numDATSOne=numDataClean(1:2:end);
-                numDATSTwo=numDataClean(2:2:end,1);
-                x=1;
-                for x=1:length(numDATSOne)
-                    numDataHold(1)=numDATSOne(x);
-                    numDataHold(2)=numDATSTwo(x);
-			%{
-                    if nh1 ~= nan || nh2 ~= nan %exclusive or
-                           navg=nh1+nh2
-                    end
-                  if nh1 ~= nan && nh2 ~=nan
-                             navg= sun(nh1(isnan(num blah blah blah /2
-                     end
-                     if nh1 == nan && nh2 ==  nan
-                             navg = nan
-                 end
-			%}
-                 %   numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
-                end
-                numDAvgOneMin=numDAvgOneMin';
-                
-				%
-                %either throw it out
-                %avg with zero
-                %leave it be
-
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			
+			%oneMinFullSet=cell(length(numDAvgOneMin),1);
+			textDataEven=textData(2:2:end,1);
+			
+			for count=1:length(numDAvgOneMin+1)
+				if count==1;
+					fid=fopen(['MyFile_'  num2str(startNum) '.txt'],'w');
+					header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+					fprintf(fid, [ header '\n']);
+					
+				else
+					numDataText=num2str(numDAvgOneMin(count-1));
+					textDatLine=char(textDataEven(count-1));
+					%numDataText=num2str(numDataText);
+					if numel(numDataText) == 8 %100
+						numDataText=numDataText(1:6);
+						
+						textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0   ' numDataText]);
+						fprintf(fid, [ textLine '\n']);
+						
+					elseif numel(numDataText) == 7 %10
+						numDataText=numDataText(1:5);
+						textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0    ' numDataText]);
+						fprintf(fid, [ textLine '\n']);
+						
+					elseif 	numel(numDataText) == 6 %1
+						numDataText=numDataText(1:4);
+						textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0     ' numDataText]);
+						fprintf(fid, [ textLine '\n']);
+						
+					else
+						warning(['Inputing NaN for line ' num2str(count)]);
+						textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0      NaN']);
+						fprintf(fid, [ textLine '\n']);
+					end
+					
+				end
 			end
-			%}
-			%%%%%%%%%%%%%%%%%%%%%%%%%%
-			%{
-            avgSet=1;
-            count=1;
-            incr3=2;
-            
-            oneMinFullSet=cell(((length(textData))/2+1))
-            if avgSet==1
-                for count=1:(length(textData))
-                    if count == 1
-                        oneMinNumLine=num2str(numDataClean(1));
-                        %oneMinNumLine=num2str(oneMinNumLine);
-                        oneMinNumLine=oneMinNumLine(1:5);
-                        oneMinDateLine= char(textData(1));
-                        textLine = (['350 ' oneMinDateLine(1:4) '   ' oneMinDateLine(6:7) '  ' oneMinDateLine(9:10) '  ' oneMinDateLine(12:13) '  ' oneMinDateLine(15:16) '.0    ' oneMinNumLine]);
-                        oneMinFullSet(1,1)=cellstr(textLine);
-                    else
-                        oneMinNumLine=mean(numDataClean(incr3:incr3+1));
-                        oneMinNumLine=num2str(oneMinNumLine);
-                        oneMinNumLine=oneMinNumLine(1:5);
-                        oneMinDateLine = char(textData(incr3+1));
-                        textLine = (['350 ' oneMinDateLine(1:4) '   ' oneMinDateLine(6:7) '  ' oneMinDateLine(9:10) '  ' oneMinDateLine(12:13) '  ' oneMinDateLine(15:16) '.0    ' oneMinNumLine]);
-                        incr3=incr3+2;
-                        oneMinFullSet(count,1)=cellstr(textLine);
-                        if (length(textData) <= (incr3)) ==1 %For the record, I have no idea how this works or
-                            %why it works so well, but it does so just keep
-                            %it here and don't touch it. thx
-                            break
-                        end
-                    end
-                end
-            end
-			%}
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-			%{
-            A  = '350 2014    1   1   0   0.0    40.39'
-            header1 = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
-            fid=fopen('MyFile.txt','w');
-            fprintf(fid, [ header1 '\n']);
-            fprintf(fid, [ A '\n']);
-            fclose(fid);
-            STN YEAR  MON  DAY  HR  MIN  O3(PPB)
-            350 2014    1   1   0   0.0    40.39
-			%}
+			disp(['MyFile_'  num2str(startNum) '.txt SUCCESSFUL']);
+			fclose(fid);
+			
 		else
-			warning(['FILE ' titleText ' DOES NOT EXIST'])
-			fileIsReal=0;
+			warning([ titleText  ' DOES NOT EXIST'])
+			%fileIsReal=0;
 		end
 	else
 		% disp(['FILE ' num2str(startNum) '.dat DOES NOT EXIST']);
@@ -250,38 +184,29 @@ end
 
 
 time=toc;
-disp([ num2str(time) ' seconds total']);
-%disp([ (num2str((abs((endNum-startNumForCalc)))/time) ' seconds average per file.']);
-%disp([ num2str((abs(endNum-startNumForCalc))/time) ' seconds average' ]);
-disp([ num2str((abs((time/(endNum-startNumForCalc))))) ' seconds/file']);
+disp('----------------------------');
 
-%{
-if avgset==1
-    for count = 1:1 %length(textdata);
-        a=num2str(numdataClean(count));
-        a=a(1:5);
-        OneMinDateLine = char(textdata(count));
-        textline = (['350 ' OneMinDateLine(1:4) '   ' OneMinDateLine(6:7) '  ' OneMinDateLine(9:10) '  ' OneMinDateLine(12:13) '  ' OneMinDateLine(15:16) '.0    ' a]);
-    end
+if time < 60
+disp([ num2str(time) ' seconds elapsed']);
+else
+disp([num2str(time/60) ' minutes elapsed']);
 end
-%}
+
+if endNum-startNumForCalc ~= 0
+	disp([ num2str((abs((time/(endNum-startNumForCalc))))) ' seconds/file']);
+
+else
+	disp([ num2str(time) ' seconds/file']);
+end
+
+
+fclose all;
 
 clear structData
 
-
+clear tableData  numDataOdd numDataHold numDataEven numDataClean
 clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
 clear startNum y.qyBgmx.pDrne
 clear time startNumForCalc numData textNumberHold x findNan
+clear fid numDataText numDAvgOneMin oneMinFullSet textData textDataEven textDatLine time
 
-%% Just in case you need this later here is the origional avergeger for 1
-%%min
-numDATSOne=numDataClean(1:2:end,1);
-numDATSTwo=numDataClean(2:2:end,1);
-x=1;
-for x=1:length(numDATSOne)
-	numDataHold(1)=numDATSOne(x);
-	numDataHold(2)=numDATSTwo(x);
-	numDAvgOneMin(x)  = (sum(numDataHold(~isnan(numDataHold)))/2);
-end
-numDAvgOneMin=numDAvgOneMin';
-%%
