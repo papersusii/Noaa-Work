@@ -33,7 +33,7 @@ clear all
 clc
 tic
 startNum = 1;
-endNum = 401;
+endNum = 1;
 
 
 startNumForCalc=startNum;
@@ -47,24 +47,24 @@ disp(['End: ' num2str(endNum)])
 for startNum = startNum:endNum
 	if startNum ~= 40
 		if numel(num2str(startNum)) == 1;
-			textNumberHold = num2str(startNum);
-			textIncrString = ['00' textNumberHold];
+			titleText = ['BAO_OZ3_201400' num2str(startNum) '.dat'];
 		end
 		if numel(num2str(startNum)) == 2;
-			textNumberHold = num2str(startNum);
-			textIncrString = ['0' textNumberHold];
+			
+			titleText = ['BAO_OZ3_20140' num2str(startNum) '.dat'];
 		end
 		if numel(num2str(startNum)) == 3;
-			textIncrString = num2str(startNum);
+			titleText = ['BAO_OZ3_2014' num2str(startNum) '.dat'];
 		end
-		titleText = ['BAO_OZ3_2014' textIncrString '.dat'];
+		cd C:\Users\Ian\Documents\MATLAB\DATA_RAW
 		if exist(titleText,'file') == 2
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Imports Data
 			tableData=readtable(titleText);
 			tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
 			
 			numData = tableData.ozone;
 			textData = tableData.date;
-			%x=1;
 			if iscell(numData)== 1;
 				
 				numData=cell2table(numData);
@@ -97,9 +97,9 @@ for startNum = startNum:endNum
 			end
 			numDataClean=numDataClean+.0001; %might me unnecisary but idk so im leaving it
 			numDataClean(numDataClean>200)=NaN;
-			numDataClean(numDataClean<1)=NaN;
+			numDataClean(numDataClean<.001)=NaN;
 			
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Average for 2 min
 			
 			%disp(['FILE ' num2str(startNum) '.dat SUCCESSFUL'])
 			clear numDataOdd numData Even numDataHold x
@@ -131,11 +131,27 @@ for startNum = startNum:endNum
 				end
 			end
 			
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Average for 5 min
+			try
+				for count=1:length(numDataClean)
+					if count==1
+						numDataHold=numDataClean(1:9,1);
+						numDAvgFiveMin(1,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(1:9,1))))));
+					else
+						numDataHold=numDataClean(((count-1)*10):((count-1)*10+9),1);
+						numDAvgFiveMin(count,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(((count-1)*10):((count-1)*10+9),1))))));
+						
+					end
+				end
+			catch
+				disp('too muich rim make the ride too hard');
+			end
+			
+			%%%%%%%%%%%%%convert and combine 2 min, easily changed for 5/60
 			
 			%oneMinFullSet=cell(length(numDAvgOneMin),1);
 			textDataEven=textData(2:2:end,1);
-			
+			cd C:\Users\Ian\Documents\MATLAB
 			for count=1:length(numDAvgOneMin+1)
 				if count==1;
 					fid=fopen(['MyFile_'  num2str(startNum) '.txt'],'w');
@@ -173,6 +189,8 @@ for startNum = startNum:endNum
 			disp(['MyFile_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
 			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			
 		else
 			warning([ titleText  ' DOES NOT EXIST'])
 			%fileIsReal=0;
@@ -205,8 +223,86 @@ fclose all;
 clear structData
 
 clear tableData  numDataOdd numDataHold numDataEven numDataClean
-clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine startnum textIncrString textLine titleText
+clear avgSet count endNum fileIsReal header incr3 oneMinDateLine oneMinNumLine 
+clear startnum textIncrString textLine titleText
 clear startNum y.qyBgmx.pDrne
 clear time startNumForCalc numData textNumberHold x findNan
 clear fid numDataText numDAvgOneMin oneMinFullSet textData textDataEven textDatLine time
+%{
+%%
+%this is just a save in case something bad happnes. Below is "Its just so
+%good"
 
+sum(not(isnan(numDataClean(1:10,1))))
+
+numDataHold=numDataClean(1:10,1);
+(sum(numDataHold(~isnan(numDataHold)))/2)
+
+numDataHold=numDataClean(1:10,1);
+(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(1:10,1))))))
+
+numDAvgFiveMin=zeros(length(numDataClean)/10,1);
+try
+for count=1:length(numDataClean)
+	if count==1
+		numDataHold=numDataClean(1:9,1);
+		numDAvgFiveMin(1,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(1:9,1))))));
+	else
+		numDataHold=numDataClean(((count-1)*10):((count-1)*10+9),1);
+		numDAvgFiveMin(count,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(((count-1)*10):((count-1)*10+9),1))))));
+		
+	end
+end
+catch
+	disp('too muich rim make the ride too hard');
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%and below again is itworkstoplot
+incr=1;
+
+%myImport=importdata(['MyFile_' num2str(incr) '.txt']);
+myImport=importdata('bao_o3_300m_min_01_2014.dat');
+
+clear Y M D H l MI S time data
+Y = myImport.data(:,2);
+M = myImport.data(:,3);
+D = myImport.data(:,4);
+H = myImport.data(:,5);
+l = length(Y);
+MI = myImport.data(:,6);
+S(l,1) = 0;
+time = datetime(Y,M,D,H,MI,S);
+data = myImport.data(:,7);
+data(data>65)=NaN;
+plot(time,data);         
+ylabel('Ozone ppb');
+hold on;
+% x = x + 1;
+disp('plot 2011 succsessful');
+print('processed_1','-dpng');
+close all
+
+for incr=1:31
+myImport=importdata(['MyFile_' num2str(incr) '.txt']);
+
+clear Y M D H l MI S time data
+Y = myImport.data(:,2);
+M = myImport.data(:,3);
+D = myImport.data(:,4);
+H = myImport.data(:,5);
+l = length(Y);
+MI = myImport.data(:,6);
+S(l,1) = 0;
+time = datetime(Y,M,D,H,MI,S);
+data = myImport.data(:,7);
+data(data>65)=NaN;
+plot(time,data,'r');         
+ylabel('Ozone ppb');
+hold on;
+% x = x + 1;
+disp('plot 2011 succsessful');
+
+end
+print('processed_2','-dpng');
+close all
+%}
