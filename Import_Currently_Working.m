@@ -205,13 +205,14 @@ for startNum = startNum:endNum
 				%disp('overflow on 5 min')
 				%disp(a)
 			end
-
-% 			numDAvgFiveMin=numDAvgFiveMin(numDAvgFiveMin>=0);
+			
+			% 			numDAvgFiveMin=numDAvgFiveMin(numDAvgFiveMin>=0);
 			%%%%%%%%%%%%%convert and combine 2 min, easily changed for 5/60
 			clear count
 			%oneMinFullSet=cell(length(numDAvgOneMin),1);
 			textDataEven=textData(2:2:end,1);
-			cd C:\Users\Ian\Documents\MATLAB
+			cd C:\Users\Ian\Documents\MATLAB\Just_Work
+			%cd C:\Users\Ian\Documents\MATLAB
 			numDAvgOneMinNew=numDAvgOneMinNew+.0001;
 			try
 				for count=1:(length(numDAvgOneMinNew)+1)
@@ -223,7 +224,7 @@ for startNum = startNum:endNum
 						numDataText=num2str(numDAvgOneMinNew(count-1));
 						textDatLine=char(textDataEven(count-1));
 						%numDataText=num2str(numDataText);
-% 						disp(count)
+						% 						disp(count)
 						if numel(numDataText) == 8 %100
 							numDataText=numDataText(1:6);
 							
@@ -268,7 +269,7 @@ for startNum = startNum:endNum
 				textDataFive(count,1)=cellstr(holdout);
 			end
 			
-			cd C:\Users\Ian\Documents\MATLAB
+			cd C:\Users\Ian\Documents\MATLAB\Just_Work
 			numDAvgFiveMinNew=numDAvgFiveMinNew+.0001;
 			try
 				for count=1:(length(numDAvgFiveMinNew)+1)
@@ -297,7 +298,7 @@ for startNum = startNum:endNum
 							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0     ' numDataText]);
 							fprintf(fid, [ textLine '\n']);
 							
-					%	elseif numel(numDataText) == 5
+							%	elseif numel(numDataText) == 5
 							
 						else
 							%warning(['Inputing NaN for line ' num2str(count)]);
@@ -316,6 +317,86 @@ for startNum = startNum:endNum
 			%disp('asdfasdfasdfasfd')
 			
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			
+			a=1;
+			try
+				for a=1:length(numDAvgOneMinNew)
+					%numDAvgFiveMinNew(a,1)=mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1));
+					
+					numDataHold=numDAvgOneMinNew(((a-1)*60+1):((a)*60),1);
+					
+					numDAvgFiveMinNew(a,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));
+					if a==79
+						%disp(numDAvgFiveMinNew(a,1))
+						
+						% 			TEST=mean(numDAvgOneMinNew((60*(a-1)+1):(60*a),1));
+					end
+					% 		disp([num2str(a) '-' num2str(mean(numDAvgOneMinNew((60*(a-1)+1):(60*a),1)))]);
+				end
+			catch
+				%disp('overflow on 60 min')
+				%disp(a)
+			end
+			
+			
+			textDataFive=textData(1:120:end,1);
+			for count=1:length(textDataFive)
+				holdout=char(textDataFive(count,1));
+				holdout=holdout(1:17);
+				holdout=[holdout '00'];
+				textDataFive(count,1)=cellstr(holdout);
+			end
+			
+			cd C:\Users\Ian\Documents\MATLAB\Just_Work
+			numDAvgFiveMinNew=numDAvgFiveMinNew+.0001;
+			try
+				for count=1:(length(numDAvgFiveMinNew)+1)
+					if count==1;
+						fid=fopen(['SixtyMinute_'  num2str(startNum) '.txt'],'w');
+						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
+						fprintf(fid, [ header '\n']);
+						
+					else
+						numDataText=num2str(numDAvgFiveMinNew(count-1));
+						textDatLine=char(textDataFive(count-1));
+						%numDataText=num2str(numDataText);
+						if numel(numDataText) == 8 %100
+							numDataText=numDataText(1:6);
+							
+							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0   ' numDataText]);
+							fprintf(fid, [ textLine '\n']);
+							
+						elseif numel(numDataText) == 7 %10
+							numDataText=numDataText(1:5);
+							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0    ' numDataText]);
+							fprintf(fid, [ textLine '\n']);
+							
+						elseif 	numel(numDataText) == 6 %1
+							numDataText=numDataText(1:4);
+							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0     ' numDataText]);
+							fprintf(fid, [ textLine '\n']);
+							
+							%	elseif numel(numDataText) == 5
+							
+						else
+							%warning(['Inputing NaN for line ' num2str(count)]);
+							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0      NaN']);
+							fprintf(fid, [ textLine '\n']);
+						end
+						
+					end
+				end
+			catch
+				%disp(['5 min average failed on file ' num2str(startNum)])
+			end
+			disp(['SixtyMin_'  num2str(startNum) '.txt SUCCESSFUL']);
+			fclose(fid);
+			%fclose all;
+			%disp('asdfasdfasdfasfd')
+			
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			
 		else
 			warning([ titleText  ' DOES NOT EXIST'])
 			%fileIsReal=0;
@@ -345,7 +426,7 @@ end
 
 fclose all;
 
-%%
+
 
 clear structData
 
