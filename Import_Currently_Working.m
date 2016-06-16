@@ -17,7 +17,8 @@ Turn off a specific warning (like 'variable names were modified...')
 to turn ofh the header that says "variable names were modified to make them valid matlab identifiers"
 just run the command that issues a warning, then directly after run
 
-tableData=readtable('BAO_OZ3_2014001.dat'); %Don't use this if you have a different error
+cd C:\Users\Ian\Documents\MATLAB
+tableData=readtable('bao_o3_300m_min_01_2014.dat'); %Don't use this if you have a different error
 [a, MSGID] = lastwarn();
 warning('off', MSGID)
 clear tableData a MSGID
@@ -34,7 +35,7 @@ clear all
 clc
 tic
 startNum = 1;
-endNum = 500;
+endNum = 450;
 
 
 startNumForCalc=startNum;
@@ -137,7 +138,6 @@ for startNum = startNum:endNum
 					else
 						numDataHold=numDataClean(((count-1)*2+1):((count)*2),1);
 						numDAvgOneMinNew(count,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(((count-1)*2+1):((count)*2),1))))));
-						
 					end
 				end
 			catch
@@ -148,6 +148,7 @@ for startNum = startNum:endNum
 				
 			end
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Average for 5 min
+			%{
 			try
 				for count=1:length(numDataClean)
 					if count==1
@@ -165,14 +166,55 @@ for startNum = startNum:endNum
 				%disp('5 min average SUCCESSFUL');
 				numDAvgFiveMin(count,1)=(sum(numDataHold(~isnan(numDataHold)))/(sum(not(isnan(numDataClean(((count-1)*10+1):end,1))))));; %how does this work? idk but it doees
 			end
-			
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			a=1;
+			clear numDAvgFiveMin
+% 			numDAvgFiveMin=zeros(1,length(numDAvgOneMinNew));
+% 			numDAvgFiveMin=numDAvgFiveMin';
+% 			numDAvgFiveMin(1:end,1)=-1;
+			try
+				for a=1:length(numDAvgOneMinNew)
+					numDAvgFiveMin(a,1)=mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1));
+					if a==79
+						
+					TEST=mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1));
+					end
+					disp([num2str(a) '-' num2str(mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1)))]);
+				end
+			catch
+				disp('overflow on 5 min')
+				disp(a)
+			end
+			%}
+			a=1;
+			try
+				for a=1:length(numDAvgOneMinNew)
+					%numDAvgFiveMinNew(a,1)=mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1));
+					
+					numDataHold=numDAvgOneMinNew(((a-1)*5+1):((a)*5),1);
+					
+					numDAvgFiveMinNew(a,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));
+					if a==79
+						%disp(numDAvgFiveMinNew(a,1))
+						
+						% 			TEST=mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1));
+					end
+					% 		disp([num2str(a) '-' num2str(mean(numDAvgOneMinNew((5*(a-1)+1):(5*a),1)))]);
+				end
+			catch
+				%disp('overflow on 5 min')
+				%disp(a)
+			end
+
+% 			numDAvgFiveMin=numDAvgFiveMin(numDAvgFiveMin>=0);
 			%%%%%%%%%%%%%convert and combine 2 min, easily changed for 5/60
 			clear count
 			%oneMinFullSet=cell(length(numDAvgOneMin),1);
 			textDataEven=textData(2:2:end,1);
 			cd C:\Users\Ian\Documents\MATLAB
+			numDAvgOneMinNew=numDAvgOneMinNew+.0001;
 			try
-				for count=1:length(numDAvgOneMinNew+1)
+				for count=1:(length(numDAvgOneMinNew)+1)
 					if count==1;
 						fid=fopen(['OneMin_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
@@ -211,12 +253,13 @@ for startNum = startNum:endNum
 					end
 				end
 			catch
-				disp(['2 min average failed on file ' num2str(startNum)])
+				%disp(['1 min average failed on file ' num2str(startNum)])
+				%disp(count)
 			end
 			disp(['OneMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
 			
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%convert and combine 5 min
 			textDataFive=textData(1:10:end,1);
 			for count=1:length(textDataFive)
 				holdout=char(textDataFive(count,1));
@@ -226,15 +269,16 @@ for startNum = startNum:endNum
 			end
 			
 			cd C:\Users\Ian\Documents\MATLAB
+			numDAvgFiveMinNew=numDAvgFiveMinNew+.0001;
 			try
-				for count=1:(length(numDAvgFiveMin)+1)
+				for count=1:(length(numDAvgFiveMinNew)+1)
 					if count==1;
 						fid=fopen(['FiveMin_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 						
 					else
-						numDataText=num2str(numDAvgFiveMin(count-1));
+						numDataText=num2str(numDAvgFiveMinNew(count-1));
 						textDatLine=char(textDataFive(count-1));
 						%numDataText=num2str(numDataText);
 						if numel(numDataText) == 8 %100
@@ -253,8 +297,10 @@ for startNum = startNum:endNum
 							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0     ' numDataText]);
 							fprintf(fid, [ textLine '\n']);
 							
+					%	elseif numel(numDataText) == 5
+							
 						else
-							warning(['Inputing NaN for line ' num2str(count)]);
+							%warning(['Inputing NaN for line ' num2str(count)]);
 							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0      NaN']);
 							fprintf(fid, [ textLine '\n']);
 						end
@@ -262,18 +308,16 @@ for startNum = startNum:endNum
 					end
 				end
 			catch
-				disp(['5 min average failed on file ' num2str(startNum)])
+				%disp(['5 min average failed on file ' num2str(startNum)])
 			end
 			disp(['FiveMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
-			
-			
-			
-			
+			%fclose all;
+			%disp('asdfasdfasdfasfd')
 			
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		else
-			%warning([ titleText  ' DOES NOT EXIST'])
+			warning([ titleText  ' DOES NOT EXIST'])
 			%fileIsReal=0;
 		end
 	else
@@ -300,6 +344,8 @@ end
 
 
 fclose all;
+
+%%
 
 clear structData
 
