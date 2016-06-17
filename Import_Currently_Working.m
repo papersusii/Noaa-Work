@@ -119,7 +119,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgOneMinNew)+1)
 					if count==1;
-						fid=fopen(['OneMin_2014_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['OneMin_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -161,7 +161,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgFiveMinNew)+1)
 					if count==1;
-						fid=fopen(['FiveMin_2014_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['FiveMin_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -211,7 +211,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgSixtyMinNew)+1)
 					if count==1;
-						fid=fopen(['SixtyMinute_2014'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['SixtyMinute_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
