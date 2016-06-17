@@ -34,8 +34,8 @@ This also works for any other warnings
 clear all
 clc
 tic
-startNum = 1;
-endNum = 450;
+startNum = 135;
+endNum = 135;
 
 
 startNumForCalc=startNum;
@@ -325,7 +325,7 @@ for startNum = startNum:endNum
 					
 					numDataHold=numDAvgOneMinNew(((a-1)*60+1):((a)*60),1);
 					
-					numDAvgFiveMinNew(a,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));
+					numDAvgSixtyMinNew(a,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));
 					if a==79
 						%disp(numDAvgFiveMinNew(a,1))
 						
@@ -348,16 +348,29 @@ for startNum = startNum:endNum
 			end
 			
 			cd C:\Users\Ian\Documents\MATLAB\Just_Work
-			numDAvgFiveMinNew=numDAvgFiveMinNew+.0001;
+			disp('adding')
+			for x=1:length(numDAvgSixtyMinNew)
+				holdit=numDAvgSixtyMinNew(x);
+				holdit=num2str(holdit);
+				if holdit(end) ~= '9'
+					numDAvgSixtyMinNew(x)=numDAvgSixtyMinNew(x)+.0001;
+				else
+					disp('das nine')
+				end
+					
+			end
+		%	numDAvgSixtyMinNew=numDAvgSixtyMinNew+.0001
+						%disp('adding')
+
 			try
-				for count=1:(length(numDAvgFiveMinNew)+1)
+				for count=1:(length(numDAvgSixtyMinNew)+1)
 					if count==1;
 						fid=fopen(['SixtyMinute_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 						
 					else
-						numDataText=num2str(numDAvgFiveMinNew(count-1));
+						numDataText=num2str(numDAvgSixtyMinNew(count-1));
 						textDatLine=char(textDataFive(count-1));
 						%numDataText=num2str(numDataText);
 						if numel(numDataText) == 8 %100
