@@ -44,16 +44,16 @@ for startNum = startNum:endNum
 		if numel(num2str(startNum)) == 3;
 			titleText = ['BAO_OZ3_2014' num2str(startNum) '.dat'];
 		end
-		disp(['Analyzing file ' titleText ' for import...']); %this adds to the authenticity a little bit
+		%disp(['Analyzing file ' titleText ' for import...']); %this adds to the authenticity a little bit
 		for count=1:4  %If for some reason you wan the program to take longer than it needs to, simply put a different number in for '4'.
-			pause(rand); %pauses for a random interval between 0 and 1 second. It looks more realistic, because the dots will appear at different intervals and it looks like the computer is thinking about something
+			%pause(rand); %pauses for a random interval between 0 and 1 second. It looks more realistic, because the dots will appear at different intervals and it looks like the computer is thinking about something
 			%pause(.25);  %this will display a '...' every quarter second. Looks okay and you can calculate just how much time the loop will take
-			disp('...');
+			%disp('...'); %you have to uncomment this for it to work
 		end
 
 		cd C:\Users\Ian\Documents\MATLAB\DATA_RAW %file path to where the raw data is
 		if exist(titleText,'file') == 2
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Imports Data
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Imports Data and Cleans it Up
 			tableData=readtable(titleText);
 			tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
 			numData = tableData.ozone;
@@ -104,15 +104,22 @@ for startNum = startNum:endNum
 				end
 			catch
 			end
-			%%%%%%%%%%%%%convert and combine 2 min, easily changed for 5/60
-			clear count
-			textDataEven=textData(2:2:end,1);
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Avg for 60 Min
+			try
+				for count=1:length(numDAvgOneMinNew)
+					numDataHold=numDAvgOneMinNew(((count-1)*60+1):((count)*60),1);
+					numDAvgSixtyMinNew(count,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));				
+				end
+			catch
+			end
+			%%%%%%%%%%%%%%%%%%%%%%Convert, Combine, And print 2 minute Data
 			cd C:\Users\Ian\Documents\MATLAB\Just_Work %path to where you want the files to go
+			textDataEven=textData(2:2:end,1);
 			numDAvgOneMinNew=numDAvgOneMinNew+.0001;
 			try
 				for count=1:(length(numDAvgOneMinNew)+1)
 					if count==1;
-						fid=fopen(['OneMin_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['OneMin_2014_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -141,7 +148,8 @@ for startNum = startNum:endNum
 			end
 			disp(['OneMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%convert and combine 5 min
+			
+			%%%%%%%%%%%%%%%%%%%%%%%%%Convert, Combine, and Print 5 min Data
 			textDataFive=textData(1:10:end,1);
 			for count=1:length(textDataFive)
 				holdout=char(textDataFive(count,1));
@@ -149,12 +157,11 @@ for startNum = startNum:endNum
 				holdout=[holdout '00'];
 				textDataFive(count,1)=cellstr(holdout);
 			end
-			cd C:\Users\Ian\Documents\MATLAB\Just_Work  %path to where you want the files to go
 			numDAvgFiveMinNew=numDAvgFiveMinNew+.0001;
 			try
 				for count=1:(length(numDAvgFiveMinNew)+1)
 					if count==1;
-						fid=fopen(['FiveMin_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['FiveMin_2014_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -183,14 +190,8 @@ for startNum = startNum:endNum
 			end
 			disp(['FiveMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
-			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-			count=1;
-			try
-				for count=1:length(numDAvgOneMinNew)
-					numDataHold=numDAvgOneMinNew(((count-1)*60+1):((count)*60),1);
-					numDAvgSixtyMinNew(count,1)=(sum(numDataHold(~isnan(numDataHold))))/(sum(not(isnan(numDataHold))));				end
-			catch
-			end
+			
+			%%%%%%%%%%%%%%%%%%%%%Convert, Combine, and print 60 minute data
 			textDataFive=textData(1:120:end,1);
 			for count=1:length(textDataFive)
 				holdout=char(textDataFive(count,1));
@@ -198,8 +199,6 @@ for startNum = startNum:endNum
 				holdout=[holdout '00'];
 				textDataFive(count,1)=cellstr(holdout);
 			end
-			cd C:\Users\Ian\Documents\MATLAB\Just_Work  %path to where you want the files to go
-			disp('adding')
 			for count=1:length(numDAvgSixtyMinNew)
 				holdit=numDAvgSixtyMinNew(count);
 				holdit=num2str(holdit);
@@ -212,7 +211,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgSixtyMinNew)+1)
 					if count==1;
-						fid=fopen(['SixtyMinute_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['SixtyMinute_2014'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -241,6 +240,7 @@ for startNum = startNum:endNum
 			end
 			disp(['SixtyMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
+			
 		else
 			warning([ titleText  ' DOES NOT EXIST'])
 		end
