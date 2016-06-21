@@ -29,7 +29,7 @@ This also works for any other warnings
 clc
 tic
 startNum = 1;
-endNum = 450;
+endNum = 1;
 startNumForCalc=startNum;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
@@ -119,7 +119,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgOneMinNew)+1)
 					if count==1;
-						fid=fopen(['OneMin_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['OneMin_2014_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -161,7 +161,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgFiveMinNew)+1)
 					if count==1;
-						fid=fopen(['FiveMin_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['FiveMin_2014_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -211,7 +211,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgSixtyMinNew)+1)
 					if count==1;
-						fid=fopen(['SixtyMinute_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['SixtyMinute_2014_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -233,7 +233,8 @@ for startNum = startNum:endNum
 							%warning(['Inputing NaN for line ' num2str(count)]); %this line is unnecissary but will make the program look cooler
 							textLine=(['350 ' textDatLine(1:4) '   ' textDatLine(6:7) '  ' textDatLine(9:10) '  ' textDatLine(12:13) '  ' textDatLine(15:16) '.0      NaN']);
 							fprintf(fid, [ textLine '\n']);
-						end
+						end %this is an end function and it ends the function. It is for the functino to stop so that it will stop
+						
 					end
 				end
 			catch
