@@ -14,8 +14,8 @@ run the code below where cd D:\xxxx is the path to a file similar to the
 ones that were causing the warnings. readtable('xxx') where xxx is the full
 filename of the file. copy and paste into command window and hit enter.
 
-cd C:\Users\Ian\Documents\MATLAB
-tableData=readtable('bao_o3_300m_min_01_2014.dat'); %Don't use this if you have a different error
+cd C:\Users\Ian\Documents\MATLAB\DATA_2016
+tableData=readtable('BAO_OZ3_2014002.dat'); %Don't use this if you have a different error
 [a, MSGID] = lastwarn();
 warning('off', MSGID)
 clear tableData a MSGID
@@ -26,23 +26,39 @@ if you need those in the future, I wouldn't do this.
 This also works for any other warnings
 %}
 %}
+
+startNum = 1;
+endNum = 500;
+year=globalyear;
+
 clc
 tic
-startNum = 1;
-endNum = 1;
+fclose all;
+close all
+
 startNumForCalc=startNum;
 disp(['Start: ' num2str(startNum)])
 disp(['End: ' num2str(endNum)])
+
+disp(year);
+dirimportdata=['C:\Users\Ian\Documents\MATLAB\DATA_' year];
+direxportdata=['C:\Users\Ian\Documents\MATLAB\TextFiles_' year];
+
+importyear=year;
+
+% importyear='2016';
+exportyear=year;
+
 for startNum = startNum:endNum
-	if startNum ~= 40 %idk why but something was wrong with file 40 so
+	if startNum ~= 40 %idk why but something was wrong with file 40 on 2014 so
 		if numel(num2str(startNum)) == 1;
-			titleText = ['BAO_OZ3_201400' num2str(startNum) '.dat'];
+			titleText = ['BAO_OZ3_' importyear '00' num2str(startNum) '.dat'];
 		end
 		if numel(num2str(startNum)) == 2;
-			titleText = ['BAO_OZ3_20140' num2str(startNum) '.dat'];
+			titleText = ['BAO_OZ3_' importyear '0' num2str(startNum) '.dat'];
 		end
 		if numel(num2str(startNum)) == 3;
-			titleText = ['BAO_OZ3_2014' num2str(startNum) '.dat'];
+			titleText = ['BAO_OZ3_' importyear num2str(startNum) '.dat'];
 		end
 		%disp(['Analyzing file ' titleText ' for import...']); %this adds to the authenticity a little bit
 		for count=1:4  %If for some reason you wan the program to take longer than it needs to, simply put a different number in for '4'.
@@ -51,8 +67,9 @@ for startNum = startNum:endNum
 			%disp('...'); %you have to uncomment this for it to work
 		end
 
-		cd C:\Users\Ian\Documents\MATLAB\DATA_RAW %file path to where the raw data is
+		cd(dirimportdata) %file path to where the raw data is
 		if exist(titleText,'file') == 2
+			try
 			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Imports Data and Cleans it Up
 			tableData=readtable(titleText);
 			tableData.Properties.VariableNames = {'date' 'two' 'ozone' 'four' 'five' 'six' 'seven' 'eight' 'nine' 'ten'};
@@ -113,13 +130,13 @@ for startNum = startNum:endNum
 			catch
 			end
 			%%%%%%%%%%%%%%%%%%%%%%Convert, Combine, And print 2 minute Data
-			cd C:\Users\Ian\Documents\MATLAB\Just_Work %path to where you want the files to go
+			cd(direxportdata) %path to where you want the files to go
 			textDataEven=textData(2:2:end,1);
 			numDAvgOneMinNew=numDAvgOneMinNew+.0001;
 			try
 				for count=1:(length(numDAvgOneMinNew)+1)
 					if count==1;
-						fid=fopen(['OneMin_2014_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['OneMin_' exportyear '_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -161,7 +178,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgFiveMinNew)+1)
 					if count==1;
-						fid=fopen(['FiveMin_2014_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['FiveMin_' exportyear '_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -211,7 +228,7 @@ for startNum = startNum:endNum
 			try
 				for count=1:(length(numDAvgSixtyMinNew)+1)
 					if count==1;
-						fid=fopen(['SixtyMinute_2014_'  num2str(startNum) '.txt'],'w');
+						fid=fopen(['SixtyMinute_' exportyear '_'  num2str(startNum) '.txt'],'w');
 						header = 'STN YEAR  MON  DAY  HR  MIN  O3(PPB)';
 						fprintf(fid, [ header '\n']);
 					else
@@ -242,6 +259,11 @@ for startNum = startNum:endNum
 			disp(['SixtyMin_'  num2str(startNum) '.txt SUCCESSFUL']);
 			fclose(fid);
 			
+			catch
+				warning(['something went terribly wrong at file ' num2str(startNum)]);
+				
+		end
+			
 		else
 			warning([ titleText  ' DOES NOT EXIST'])
 		end
@@ -262,4 +284,4 @@ else
 	disp([ num2str(time) ' seconds/file']);
 end
 fclose all;
-clear findNan a ans count endNum fid header holdit holdout numData numDataClean numDataHold numDataText numDAvgFiveMinNew numDAvgOneMinNew numDAvgSixtyMinNew startNum startNumForCalc tableData textData textDataEven textDataFive textDatLine textLine time titleText
+%clear findNan a ans count endNum fid header holdit holdout numData numDataClean numDataHold numDataText numDAvgFiveMinNew numDAvgOneMinNew numDAvgSixtyMinNew startNum startNumForCalc tableData textData textDataEven textDataFive textDatLine textLine time titleText
