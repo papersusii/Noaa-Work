@@ -7,6 +7,13 @@ clc
 global globalyear
 globalyear='2014';
 pleaseplease={'2009' '2010' '2011' '2012' '2013' '2014' '2015' '2016'};
+% 
+% picfileprevious = ''
+% txtfileprevious = ''
+% 
+% dirpath = '
+% dirpictitle = 'DATA_
+% dirtxttitle
 
 for z=1:9
 	try
