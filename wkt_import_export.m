@@ -12,11 +12,11 @@ hourText={'00' '01' '02' '03' '04' '05' '06' '07' '08' '09' '10' '11' '12' '13' 
 
 %direxportdata
 
-for yearNum=1:1
-	for monthNum=5:5
+for yearNum=1:8
+	for monthNum=1:12
 		cd(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 		disp(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
-		for dayNum = 1:1
+		for dayNum = 1:31
 			disp(num2str(dayNum));
 			for hourNum=1:24
 				try
