@@ -15,9 +15,12 @@ fileDayNum=1;
 for yearNum=1:8
 	fileDayNum=1;
 	for monthNum=1:12
+		cd(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
+		disp(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 		for dayNum = 1:31
 			cd(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 			disp(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
+			
 			disp(num2str(dayNum));
 			for hourNum=1:23
 				try
@@ -35,6 +38,7 @@ for yearNum=1:8
 			end
 			cd(['C:\Users\Ian\Documents\MATLAB\WKT\TextFiles_' char(yearText(yearNum))]);
 			%%%%%%%%%%
+			try
 			numDataClean=rawData;
 			numDataClean=numDataClean+.0001;
 			numDataClean(numDataClean>200)=NaN;
@@ -109,7 +113,7 @@ for yearNum=1:8
 			catch
 				warning('WARNINGA DJALS');
 			end
-			disp(['OneMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
+			%disp(['OneMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
 			fclose all;
 			
 			%%%%%%%%%%%%%%%%%%%%%%%%%Convert, Combine, and Print 5 min Data
@@ -152,7 +156,7 @@ for yearNum=1:8
 			catch
 				warning('WARNINGA DJALS');
 			end
-			disp(['FiveMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
+			%disp(['FiveMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
 			fclose all;
 			
 			%%%%%%%%%%%%%%%%%%%%%Convert, Combine, and print 60 minute data
@@ -204,11 +208,16 @@ for yearNum=1:8
 			catch
 				warning('WARNINGA DJALS');
 			end
-			disp(['SixtyMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
+			%disp(['SixtyMin_'  num2str(dayNum) '.txt SUCCESSFUL']);
 			fclose all;
 			
 			%end
-			fileDayNum=fileDayNum+1;
+					fileDayNum=fileDayNum+1;
+			catch
+				disp('asdfasdfasdfasdfasdfasdfsadfsdf');
+									fileDayNum=fileDayNum+1
+
+			end
 		end
 	end
 
