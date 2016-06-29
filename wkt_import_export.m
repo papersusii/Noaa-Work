@@ -18,6 +18,7 @@ for yearNum=1:8
 		cd(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 		disp(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 		for dayNum = 1:31
+			clear rawData rawImport rawText
 			cd(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 			disp(['C:\Users\Ian\Documents\MATLAB\' char(yearText(yearNum)) '\' char(monthText(monthNum))])
 			
