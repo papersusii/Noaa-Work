@@ -25,7 +25,7 @@ for yearNum=1:8
 			disp(num2str(dayNum));
 			for hourNum=1:23
 				try
-					rawImport=importdata(['wkt_ozo1_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']);
+					rawImport=importdata(['wkt_ozo3_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']);
 					if hourNum==1
 						rawData=rawImport.data(:,2);
 						rawText=rawImport.textdata(3:end,1);
@@ -34,7 +34,7 @@ for yearNum=1:8
 						rawText=[rawText;rawImport.textdata(3:end,1)];
 					end
 				catch
-					warning(['COULD NOT IMPORT wkt_ozo1_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']);
+					warning(['COULD NOT IMPORT wkt_ozo3_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']);
 				end
 			end
 			cd(['C:\Users\Ian\Documents\MATLAB\WKT\TextFiles_' char(yearText(yearNum))]);
@@ -44,7 +44,7 @@ for yearNum=1:8
 			numDataClean=numDataClean+.0001;
 			numDataClean(numDataClean>200)=NaN;
 			numDataClean(numDataClean<=5)=NaN;
-			%if (exist(['wkt_ozo1_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']) ==2) ==1
+			%if (exist(['wkt_ozo3_' char(yearText(yearNum)) '_' char(monthText(monthNum)) '_' char(dayText(dayNum)) '_' char(hourText(hourNum)) '00.dat']) ==2) ==1
 			try
 				for count=1:length(numDataClean)
 					if count==1
